@@ -1,0 +1,146 @@
+<html>
+	<head>
+		<script src="http://d3js.org/d3.v3.min.js"></script>
+		<style>
+			/* tell the SVG path to be a thin blue line without any area fill */
+			path {
+				stroke-width: 1;
+				fill: none;
+			}
+			
+			.data1 {
+				stroke: steelblue;
+			}
+
+			.data2 {
+				stroke: orange;
+			}
+
+			.axis {
+			  shape-rendering: crispEdges;
+			}
+
+			.x.axis line {
+			  stroke: lightgrey;
+			}
+
+			.x.axis .minor {
+			  stroke-opacity: .5;
+			}
+
+			.x.axis path {
+			  display: none;
+			}
+			
+			.x.axis text {
+				font-size: 14;
+			}
+
+			.y.axis line, .y.axis path {
+			  fill: none;
+			  stroke: #000;
+			}
+
+			.y.axis text {
+				font-size: 14;
+			}
+
+			.y.axisRight text {
+				fill: orange;
+			}
+			
+			.y.axisLeft text {
+				fill: steelblue;
+			}
+		</style>
+	</head>
+	<body>
+
+
+	<div id="graph" class="aGraph" style="position:absolute;top:0px;left:0; float:left;"></div>
+
+
+	<script>
+		/* implementation heavily influenced by http://bl.ocks.org/1166403 */
+		/* some arguments AGAINST the use of dual-scaled axes line graphs can be found at http://www.perceptualedge.com/articles/visual_business_intelligence/dual-scaled_axes.pdf */
+		
+		// define dimensions of graph
+		var m = [80, 80, 80, 80]; // margins
+		var w = 600 - m[1] - m[3];	// width
+		var h = 400 - m[0] - m[2]; // height
+		
+		
+		//var data3 = [1.80, 1.81, 1.82, 1.83, 1.85, 3.13, 3.07, 3.16, 3.41];
+		var data1 = [0.40, 0.40, 0.40, 0.41, 0.41, 0.68,  0.70, 0.72, 0.76];
+		var data2 = [1.40, 1.41, 1.41, 1.42, 1.44, 2.45,  2.37, 2.44, 2.65];
+		
+		
+		var xLabels = d3.time.scale().domain([new Date(2015, 0, 1), new Date(2015, 2, 20)]).range([0, w]);
+ 		var x = d3.scale.linear().domain([0, data1.length-1]).range([0, w]);
+		var y1 = d3.scale.linear().domain([0, 3]).range([h, 0]);
+	
+		//Create SVG element
+		var svg = d3.select("body")
+            .append("svg")
+            .attr("width", w)
+            .attr("height", h)
+
+		// create a line function that can convert data[] into x and y points
+		var line1 = d3.svg.line()
+			.x(function(d,i) { 
+				console.log('Plotting X1 value for data point: ' + d + ' using index: ' + i + ' to be at: ' + x(i) + ' using our xScale.');
+				return x(i); 
+			})
+			.y(function(d) { 
+				console.log('Plotting Y1 value for data point: ' + d + ' to be at: ' + y1(d) + " using our y1Scale.");
+				return y1(d); 
+			})
+			
+		// create a line function that can convert data[] into x and y points
+		var line2 = d3.svg.line()
+			.x(function(d,i) { 
+				console.log('Plotting X2 value for data point: ' + d + ' using index: ' + i + ' to be at: ' + x(i) + ' using our xScale.');
+				return x(i); 
+			})
+			.y(function(d) { 
+				console.log('Plotting Y2 value for data point: ' + d + ' to be at: ' + y1(d) + " using our y2Scale.");
+				return y1(d); 
+			})
+
+
+
+			// Add an SVG element with the desired dimensions and margin.
+			var graph = d3.select("#graph").append("svg:svg")
+			      .attr("width", w + m[1] + m[3])
+			      .attr("height", h + m[0] + m[2])
+			    .append("svg:g")
+			      .attr("transform", "translate(" + m[3] + "," + m[0] + ")");
+
+			// create xAxis
+		    //var xAxis = d3.svg.axis().scale(x).tickSize(-h).tickSubdivide(true);
+			var xAxis = d3.svg.axis().scale(xLabels).tickSize(-h).tickSubdivide(true).tickFormat(d3.time.format(" %y"));
+			graph.append("svg:g")
+			      .attr("class", "x axis")
+			      .attr("transform", "translate(0," + h + ")")
+			      .call(xAxis);
+
+
+			// create left yAxis
+			var yAxisLeft = d3.svg.axis().scale(y1).ticks(10).orient("left");
+			graph.append("svg:g")
+			      .attr("class", "y axis axisLeft")
+			      .attr("transform", "translate(0,0)")
+			      .call(yAxisLeft);
+
+	  	
+			
+			
+  			graph.append("svg:path").attr("d", line1(data1)).attr("class", "data1");
+  			graph.append("svg:path").attr("d", line2(data2)).attr("class", "data2");
+			
+		
+
+	</script>
+
+	</body>
+</html>
